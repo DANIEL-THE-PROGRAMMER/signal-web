@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import styled from "styled-components";
+import styled, { keyframes } from "styled-components";
+import { useEffect, useState } from "react";
 
 export const Header = styled.header`
   position: fixed;
@@ -73,6 +74,37 @@ export const MenuSvg = () => {
   );
 };
 
+
+const HeaderEye = keyframes`
+  0% {
+      transform: scaleY(1);
+    }
+
+    10% {
+      transform: scaleY(1);
+    }
+
+    12% {
+      transform: scaleY(0);
+    }
+
+    14% {
+      transform: scaleY(1);
+    }
+
+    18% {
+      transform: scaleY(1);
+    }
+
+    20% {
+      transform: scaleY(0);
+    }
+
+    22% {
+      transform: scaleY(1);
+    }
+`;
+
 export const HeaderLogo = styled.a`
   position: relative;
   --logo-width: clamp(115px, 20vw, 185px);
@@ -80,6 +112,7 @@ export const HeaderLogo = styled.a`
   z-index: 0;
   top: 50%;
   left: 50%;
+  cursor: pointer;
   display: grid;
   overflow: hidden;
   width: clamp(115px, 20vw, 185px);
@@ -87,7 +120,7 @@ export const HeaderLogo = styled.a`
   place-items: center;
   transform: translateX(-50%) translateY(-50%);
   @media (hover: hover) and (pointer: fine) {
-    &::before {
+    &:before {
       position: absolute;
       z-index: -1;
       top: 50%;
@@ -98,9 +131,36 @@ export const HeaderLogo = styled.a`
       box-shadow: 0 0 0 50px var(--primary);
       content: "";
       transform: translateX(-50%) translateY(-50%) scale(0);
+      transition-duration: 0.5s;
+      transition-property: transform, box-shadow;
+      transition-timing-function: cubic-bezier(0.63, 0.02, 0.05, 1);
+    }
+
+    & g {
+      transition-duration: 0.5s;
+      transition-property: transform, box-shadow;
+      transition-timing-function: cubic-bezier(0.63, 0.02, 0.05, 1);
+    }
+    & svg * {
+      transform-box: fill-box;
+      transform-origin: center center;
     }
   }
+  &:hover::before {
+    box-shadow: 0 0 0 2px var(--primary);
+    transform: translateX(-50%) translateY(-50%) scale(1);
+  }
+  &:hover g:first-child {
+    transform: translateX(-105%);
+  }
+  &:hover g:last-child {
+    transform: translateX(-300%) translateY(4%) scale(1.6);
+  }
+  &:hover g:last-child > :first-child {
+    animation: ${HeaderEye} 6s ease infinite;
+  }
 `;
+
 
 export const SaySocialSvg = () => {
   return (
@@ -202,13 +262,19 @@ export const HeroHeaderWrapper = styled.div`
   inset: 0;
 `;
 
-
-export const HeaderCursorPointer = ({ children }: { children: React.ReactNode }) => {
-  return <Link className="cursorpointer" href={``}>{children}</Link>;
+export const HeaderCursorPointer = ({
+  children,
+}: {
+  children: React.ReactNode;
+}) => {
+  return (
+    <Link className="cursorpointer" href={``}>
+      {children}
+    </Link>
+  );
 };
 
-
-export const Cursor = ({children}: { children: React.ReactNode }) => {
+export const Cursor = ({ children }: { children: React.ReactNode }) => {
   return <span className="circle">{children}</span>;
 };
 
@@ -223,7 +289,6 @@ export const CircleTitleText = styled.div`
   font-size: clamp(56px, 12vw, 202px);
   line-height: 1.1;
 `;
-
 
 export const NewsBtn = styled.div`
   --width: 140px;
@@ -255,7 +320,7 @@ export const NewsBtn = styled.div`
     transform-origin: center bottom;
     transition: transform 0.3s ease;
   }
-`; 
+`;
 
 export const NewsCircle = styled.span`
   position: absolute;
@@ -271,30 +336,356 @@ export const NewsCircle = styled.span`
   transition-timing-function: ease;
 `;
 
-
 export const WheelWrapper = styled.div`
   position: absolute;
   z-index: 1;
   bottom: 0;
   left: 50%;
   width: 1000px;
+  transform: translateX(-50%) translateY(calc(100% - 100px)) translateZ(0px);
+`;
+
+export const WheelLineSvg = () => {
+  return (
+    <svg
+      className="wheel_line__DE_BW"
+      width="190"
+      height="100"
+      stroke="var(--primary)"
+    >
+      <path
+        d="M 10 50 Q 95 30 180 50"
+        stroke-width="4"
+        stroke-linecap="round"
+        fill="transparent"
+      ></path>
+    </svg>
+  );
+};
+
+export const WheelWheel = () => {
+  const [currentIndex, setCurrentIndex] = useState(0);
+
+  const handleScroll = (event: any) => {
+    const scrollAmount = event.deltaY;
+
+    let targetIndex;
+    if (scrollAmount > 0) {
+      targetIndex = (currentIndex + 1) % 12;
+    } else {
+      targetIndex = (currentIndex - 1 + 12) % 12;
+    }
+
+    const nextElementDegree = (targetIndex * (360 / 12)) & 360;
+
+    const currentElementDegree = (currentIndex * (360 / 12)) & 360;
+
+    if (scrollAmount > 0) {
+      if (
+        nextElementDegree > currentElementDegree &&
+        nextElementDegree <= (currentElementDegree + 180) % 360
+      ) {
+        setCurrentIndex(targetIndex);
+      }
+    } else {
+      if (
+        nextElementDegree < currentElementDegree &&
+        nextElementDegree >= (currentElementDegree - 180 + 360) % 360
+      ) {
+        setCurrentIndex(targetIndex);
+      }
+    }
+
+    console.log("currentIndex", currentIndex);
+  };
+
+  useEffect(() => {
+    document.addEventListener("wheel", handleScroll);
+
+    return () => {
+      document.removeEventListener("wheel", handleScroll);
+    };
+  }, [currentIndex]);
+
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 500 500"
+      className="wheel_wheel__fnjNS"
+    >
+      <defs>
+        <path
+          d="
+              M 0, 250
+              a 250,250 0 1,1 500,0
+              a 250,250 0 1,1 -500,0
+            "
+          id="textcircle"
+        ></path>
+      </defs>
+      <text
+        dy="10"
+        textLength="1570.7963267948965"
+        className="wheel_title__81w3s text-sans-serif-2-bold"
+      >
+        <textPath xlinkHref="#textcircle">
+          <tspan>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+          </tspan>
+          <tspan className="wheel_pointer__QC4tN" data-key="true" opacity="1">
+            Digital Strategy
+          </tspan>
+          <tspan>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+          </tspan>
+          <tspan
+            className="wheel_pointer__QC4tN"
+            data-key="true"
+            opacity="0.30000000000000004"
+          >
+            Content Marketing
+          </tspan>
+          <tspan>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+          </tspan>
+          <tspan className="wheel_pointer__QC4tN" data-key="true" opacity="0.3">
+            Brand Positioning
+          </tspan>
+          <tspan>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+          </tspan>
+          <tspan className="wheel_pointer__QC4tN" data-key="true" opacity="0.3">
+            Social Media Marketing
+          </tspan>
+          <tspan>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+          </tspan>
+          <tspan className="wheel_pointer__QC4tN" data-key="true" opacity="0.3">
+            Seo &amp; UX
+          </tspan>
+          <tspan>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+          </tspan>
+          <tspan className="wheel_pointer__QC4tN" data-key="true" opacity="0.3">
+            Google Ads
+          </tspan>
+          <tspan>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+          </tspan>
+          <tspan className="wheel_pointer__QC4tN" data-key="true" opacity="1">
+            Digital Strategy
+          </tspan>
+          <tspan>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+          </tspan>
+          <tspan
+            className="wheel_pointer__QC4tN"
+            data-key="true"
+            opacity="0.30000000000000004"
+          >
+            Content Marketing
+          </tspan>
+          <tspan>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+          </tspan>
+          <tspan className="wheel_pointer__QC4tN" data-key="true" opacity="0.3">
+            Brand Positioning
+          </tspan>
+          <tspan>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+          </tspan>
+          <tspan className="wheel_pointer__QC4tN" data-key="true" opacity="0.3">
+            Social Media Marketing
+          </tspan>
+          <tspan>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+          </tspan>
+          <tspan className="wheel_pointer__QC4tN" data-key="true" opacity="0.3">
+            Seo &amp; UX
+          </tspan>
+          <tspan>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+          </tspan>
+          <tspan className="wheel_pointer__QC4tN" data-key="true" opacity="0.3">
+            Google Ads
+          </tspan>
+        </textPath>
+      </text>
+    </svg>
+  );
+};
+
+
+
+export const MenuWrapper = styled.div`
+  position: fixed;
+  z-index: var(--z-index-menu);
+  display: grid;
+  overflow: auto;
+  padding: 130px calc(max(14px, 3%) + 22px) calc(max(14px, 3%) + 22px);
+  background: var(--secondary);
+  color: #fff;
+  gap: 100px;
+  inset: 0;
+`;
+
+export const MenuContent = styled.div`
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 80px;
+  @media only screen and (min-width: 1024px) {
+    flex-direction: row;
+    align-items: flex-end;
+    gap: 0;
+  }
 `;
 
 
-export const WheelLineSvg = () => {
-    return (
-      <svg
-        class="wheel_line__DE_BW"
-        width="190"
-        height="100"
-        stroke="var(--primary)"
-      >
-        <path
-          d="M 10 50 Q 95 30 180 50"
-          stroke-width="4"
-          stroke-linecap="round"
-          fill="transparent"
-        ></path>
-      </svg>
-    );
+export const MenuLeft = styled.div`
+  display: flex;
+  flex-basis: 60%;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 0.8dvh;
+`;
+
+
+export const MenuRight = styled.div`
+  display: flex;
+  flex-basis: 40%;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: min(60px, 6dvh);
+  @media only screen and (min-width: 1024px) {
+    padding: 0 3%;
+  }
+`;
+
+export const MenuText = styled.div`
+  display: inline-flex;
+  align-items: center;
+  font-size: clamp(42px, 12vw, 104px);
+  background: linear-gradient(
+    to bottom,
+    currentcolor,
+    currentcolor 50%,
+    var(--primary) 50%
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  background-position: 0 0;
+  background-size: 100% 200%;
+  color: currentcolor;
+  gap: clamp(20px, 10%, 80px);
+  line-height: 1.1;
+  -webkit-text-fill-color: transparent;
+  transition: background-position 0.3s ease;
+  &::before {
+    width: 10px;
+    height: 10px;
+    border-radius: 10px;
+    background: currentcolor;
+    content: "";
+    transition: all 0.2s ease;
+  }
+`;
+
+
+export const MenuLink = (props:any) => {
+    return(
+        <MenuText>{ props.children }</MenuText>
+    )
 }
+
+
+export const MenuBranch = styled.div`
+  display: flex;
+  flex-basis: 40%;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: min(60px, 6dvh);
+  @media only screen and (min-width: 1024px) {
+    padding: 0 3%;
+  }
+`;
+
+export const MenuCity = styled.div`
+  color: var(--primary);
+  padding: 0 20px;
+  @media only screen and (min-width: 1024px)  {
+    font-size: 34px;
+  }
+`;
+
+export const MenuAdress = styled.div`
+  color: var(--primary);
+  padding: 0 20px;
+  @media only screen and (min-width: 1024px) {
+    font-size: 34px;
+  }
+`;
+
+export const ContactButton = styled.a`
+  color: var(--primary);
+  box-shadow: inset 0 0 0 2px currentcolor;
+  position: relative;
+  z-index: 0;
+  display: inline-flex;
+  justify-content: center;
+  border-radius: 9999px;
+  cursor: pointer;
+  transition: box-shadow 0.5s ease;
+  font-size: 14px;
+  line-height: 1.5;
+  text-decoration:none;
+  @media only screen and (min-width: 1024px) .text-6 {
+    font-size: 16px;
+  }
+`;
+
+export const ButtonL = styled.span`
+  height: 40px;
+  padding: 0 22px;
+  display: inline-flex;
+  overflow: hidden;
+  align-items: center;
+  margin-top: 0.2em;
+`;
+
+export const ButtonH = styled.span`
+  color: #fff;
+  position: absolute;
+  z-index: 2;
+  display: flex;
+  overflow: hidden;
+  align-items: center;
+  justify-content: center;
+  margin-top: 0.2em;
+  inset: 0;
+`;
+
+
+export const MenuSocial = styled.span`
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 20px;
+  display: flex;
+  justify-content: space-between;
+  & span {
+    color: var(--primary);
+    transition: all 0.2s ease;
+    text-transform: uppercase;
+    font-size: 12px;
+    line-height: 1.6;
+  }
+
+  & a {
+    color: var(--primary);
+    transition: all 0.2s ease;
+    text-decoration:none;
+  }
+`;
+
+
+

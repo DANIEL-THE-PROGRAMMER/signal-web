@@ -1,32 +1,33 @@
-'use client'
+"use client";
 
 import {
   HeaderCursorPointer,
   HeroHeaderWrapper,
   Cursor,
   CircleTitle,
-  CircleTitleText
+  CircleTitleText,
+  WheelLineSvg,
+  WheelWheel,
+  WheelWrapper,
 } from "@/app/lib/styles";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 
-gsap.registerPlugin(useGSAP)
+gsap.registerPlugin(useGSAP);
 
 export const HeaderHero = () => {
+  useGSAP(() => {
+    gsap.set(".circle", {
+      backgroundColor: "rgb(135, 158, 237)",
+      clipPath: "circle(0)",
+    });
 
-
-    useGSAP(() => {
-        gsap.set(".circle", {
-          backgroundColor: "rgb(135, 158, 237)",
-          clipPath: "circle(0)",
-        });
-
-        gsap.to(".circle", {
-          clipPath: "circle(862.979px)",
-          duration: 1,
-          delay: 0.1, 
-        });
-    })
+    gsap.to(".circle", {
+      clipPath: "circle(100%)",
+      duration: 1.5,
+      delay: 0.1,
+    });
+  });
 
   return (
     <>
@@ -39,6 +40,10 @@ export const HeaderHero = () => {
             </CircleTitle>
           </Cursor>
         </HeaderCursorPointer>
+        <WheelWrapper>
+          <WheelLineSvg />
+          <WheelWheel />
+        </WheelWrapper>
       </HeroHeaderWrapper>
     </>
   );

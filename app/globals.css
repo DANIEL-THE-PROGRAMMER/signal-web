@@ -31,3 +31,30 @@ a {
   inset: 0;
   place-items: center;
 }
+
+.wheel_wheel__fnjNS {
+  position: absolute;
+  top: 6px;
+  right: 0;
+  left: 0;
+  margin: auto;
+  transition: stroke 1s var(--transition-interface-delay) ease;
+}
+
+.wheel_wheel__fnjNS {
+  width: 100%;
+  overflow: visible;
+  fill: currentcolor;
+}
+.wheel_pointer__QC4tN {
+  cursor: pointer;
+}
+
+.wheel_line__DE_BW {
+  position: absolute;
+  top: 6px;
+  right: 0;
+  left: 0;
+  margin: auto;
+  transition: stroke 1s var(--transition-interface-delay) ease;
+}

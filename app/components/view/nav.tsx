@@ -14,14 +14,40 @@ import {
   TextChildren,
 } from "@/app/lib/styles";
 import Image from "next/image";
+import { Menu } from "./menu";
+import { useEffect, useRef, useState } from "react";
 
 export const Nav = () => {
+  const [open, setOpen] = useState(false);
+
+  const [clickedAt, setClickedAt] = useState<{
+    x: number | string | undefined;
+    y: number | string | undefined;
+  }>({
+    x: 0,
+    y: 0,
+  });
+  const ref = useRef<HTMLSpanElement | null>(null);
+
+  useEffect(() => {
+
+
+    const pos = ref.current?.getBoundingClientRect();
+
+    console.log(pos)
+
+    setClickedAt({ x: pos?.left, y: pos?.top });
+  }, []);
+
   return (
     <>
+      <Menu open={open} x={clickedAt.x} y={clickedAt.y} />
       <Header>
-        <HeaderMenu>
-          <MenuSvg />
-        </HeaderMenu>
+        <span ref={ref} onClick={() => setOpen(!open)}>
+          <HeaderMenu>
+            <MenuSvg />
+          </HeaderMenu>
+        </span>
         <HeaderLogo>
           <SaySocialSvg />
         </HeaderLogo>
@@ -30,9 +56,7 @@ export const Nav = () => {
             <div>
               <HeaderButton>
                 <ButtonLabel>
-                  <TextChildren>
-                    Say Hello
-                  </TextChildren>
+                  <TextChildren>Say Hello</TextChildren>
                 </ButtonLabel>
                 <ButtonBubble>
                   <Image
